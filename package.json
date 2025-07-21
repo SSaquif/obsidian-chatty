@@ -1,0 +1,23 @@
+{
+  "name": "obsidian-voice-annotation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sadnan Saquif",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.0.15",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "builtin-modules": "3.3.0",
+    "esbuild": "^0.25.8",
+    "obsidian": "^1.8.7",
+    "tslib": "^2.8.1",
+    "typescript": "^5.8.3"
+  }
+}
