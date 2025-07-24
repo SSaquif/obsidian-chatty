@@ -10,13 +10,15 @@ import {
 } from "obsidian";
 
 interface VoiceAnnotationSettings {
-  defaultLanguage: string;
-  selectedVoice: string;
+  defaultLanguage: SpeechSynthesisVoice["lang"];
+  selectedVoice: SpeechSynthesisVoice["name"];
 }
 
 const DEFAULT_SETTINGS: VoiceAnnotationSettings = {
-  defaultLanguage: "en-US",
-  selectedVoice: "",
+  defaultLanguage: navigator.language || "",
+  selectedVoice:
+    window.speechSynthesis.getVoices().find((voice) => voice.default)?.name ||
+    "",
 };
 
 export default class VoiceAnnotationPlugin extends Plugin {
@@ -42,7 +44,11 @@ export default class VoiceAnnotationPlugin extends Plugin {
               .setTitle("Speak Selected Text")
               .setIcon("speaker")
               .onClick(() => {
-                this.speakText(selectedText, this.settings.defaultLanguage);
+                this.speakText(
+                  selectedText,
+                  this.settings.defaultLanguage,
+                  this.settings.selectedVoice
+                );
               });
           });
         }
@@ -74,22 +80,27 @@ export default class VoiceAnnotationPlugin extends Plugin {
     return uniqueLanguages;
   }
 
-  speakText(text: string, lang: string) {
+  speakText(
+    text: string,
+    lang: SpeechSynthesisVoice["lang"],
+    voice: SpeechSynthesisVoice["name"]
+  ) {
     const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
     utterance.lang = lang;
 
-    // Try to find the voice that matches the language
-    const voices = window.speechSynthesis.getVoices();
-    console.log("Available voices:", voices);
-    const matchingVoice = voices.find((voice) => {
-      //   new Notice(`voice name: ${voice.name} lang: ${voice.lang}`);
-      return voice.lang === lang;
-    });
-    if (matchingVoice) {
-      utterance.voice = matchingVoice;
-      window.speechSynthesis.speak(utterance);
-    } else {
-      new Notice(`No voice found for language: ${lang}`);
+    if (voice) {
+      let matchingVoice =
+        voices.find((v) => v.name === voice) ||
+        voices.find((v) => v.lang === lang);
+      if (matchingVoice) {
+        utterance.voice = matchingVoice;
+        window.speechSynthesis.speak(utterance);
+      } else {
+        new Notice(
+          `No voice ${voice} found for language: ${lang}, or no language has been specified.`
+        );
+      }
     }
   }
 }
@@ -217,7 +228,8 @@ class VoiceAnnotationSettingTab extends PluginSettingTab {
               "Hello, this is a test of the text-to-speech functionality.";
             this.plugin.speakText(
               testText,
-              this.plugin.settings.defaultLanguage
+              this.plugin.settings.defaultLanguage,
+              this.plugin.settings.selectedVoice
             );
           });
         });
