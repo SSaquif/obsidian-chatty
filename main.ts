@@ -27,7 +27,7 @@ export default class ChattyPlugin extends Plugin {
   async onload() {
     await this.loadSettings();
     new Notice(
-      `Voice Annotation Plugin loaded\nLanguage: ${this.settings.defaultLanguage}\nVoice: ${this.settings.selectedVoice}`
+      `Chatty Plugin Loaded\nLanguage: ${this.settings.defaultLanguage}\nVoice: ${this.settings.selectedVoice}`
     );
 
     // Add settings tab
@@ -118,7 +118,7 @@ class ChattySettingTab extends PluginSettingTab {
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h1", { text: "Voice Annotation Settings" });
+    containerEl.createEl("h1", { text: "Chatty Settings" });
 
     // Creates/Updates the relevant settings UI and functionality
     const updateSettings = () => {
