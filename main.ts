@@ -1,9 +1,33 @@
-import { App, Plugin, Notice, Editor, Menu, MarkdownView } from "obsidian";
+import {
+  App,
+  Plugin,
+  Notice,
+  Editor,
+  Menu,
+  MarkdownView,
+  PluginSettingTab,
+  Setting,
+} from "obsidian";
+
+interface VoiceAnnotationSettings {
+  defaultLanguage: string;
+  selectedVoice: string;
+}
+
+const DEFAULT_SETTINGS: VoiceAnnotationSettings = {
+  defaultLanguage: "en-US",
+  selectedVoice: "",
+};
 
 export default class VoiceAnnotationPlugin extends Plugin {
+  settings: VoiceAnnotationSettings;
+
   async onload() {
+    await this.loadSettings();
     new Notice("Voice Annotation Plugin loaded");
-    // Initialize your plugin here
+
+    // Add settings tab
+    this.addSettingTab(new VoiceAnnotationSettingTab(this.app, this));
 
     // Add an item to editor menu
     this.registerEvent(
@@ -16,16 +40,38 @@ export default class VoiceAnnotationPlugin extends Plugin {
           menu.addItem((item) => {
             item
               .setTitle("Speak Selected Text")
-              .setIcon("mic")
+              .setIcon("speaker")
               .onClick(() => {
-                // Get the language from the editor or view settings
-                // const lang = view.getMode().getLanguage() || "en-US";
-                this.speakText(selectedText, "en-US");
+                this.speakText(selectedText, this.settings.defaultLanguage);
               });
           });
         }
       )
     );
+  }
+
+  onunload() {
+    // Cancel any ongoing speech synthesis
+    window.speechSynthesis.cancel();
+  }
+
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
+
+  async saveSettings() {
+    await this.saveData(this.settings);
+  }
+
+  getAvailableVoices(): SpeechSynthesisVoice[] {
+    return window.speechSynthesis.getVoices();
+  }
+
+  getAvailableLanguages(): string[] {
+    const voices = this.getAvailableVoices();
+    const languages = voices.map((voice) => voice.lang);
+    const uniqueLanguages = [...new Set(languages)].sort();
+    return uniqueLanguages;
   }
 
   speakText(text: string, lang: string) {
@@ -34,11 +80,161 @@ export default class VoiceAnnotationPlugin extends Plugin {
 
     // Try to find the voice that matches the language
     const voices = window.speechSynthesis.getVoices();
-    const matchingVoice = voices.find((voice) => voice.lang === lang);
+    console.log("Available voices:", voices);
+    const matchingVoice = voices.find((voice) => {
+      //   new Notice(`voice name: ${voice.name} lang: ${voice.lang}`);
+      return voice.lang === lang;
+    });
     if (matchingVoice) {
       utterance.voice = matchingVoice;
+      window.speechSynthesis.speak(utterance);
     } else {
       new Notice(`No voice found for language: ${lang}`);
+    }
+  }
+}
+
+class VoiceAnnotationSettingTab extends PluginSettingTab {
+  plugin: VoiceAnnotationPlugin;
+
+  constructor(app: App, plugin: VoiceAnnotationPlugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
+
+  display(): void {
+    const { containerEl } = this;
+    containerEl.empty();
+
+    containerEl.createEl("h1", { text: "Voice Annotation Settings" });
+
+    // Wait for voices to load
+    const updateSettings = () => {
+      containerEl.querySelector("#loading-msg")?.remove();
+      containerEl.querySelector("#container")?.remove();
+
+      // Create the settings sections
+      const mainContainer = containerEl.createDiv({
+        cls: "container",
+        attr: { id: "container" },
+      });
+      const infoContainer = mainContainer.createDiv({
+        cls: "info-container",
+        attr: { id: "info-container" },
+      });
+      const settingsContainer = mainContainer.createDiv({
+        cls: "settings-container",
+        attr: { id: "settings-container" },
+      });
+      const testContainer = mainContainer.createDiv({
+        cls: "test-container",
+        attr: { id: "test-container" },
+      });
+
+      // Voice & Language info
+      const voices = this.plugin.getAvailableVoices();
+      const languages = this.plugin.getAvailableLanguages();
+      if (voices.length > 0) {
+        const infoEl = infoContainer.createDiv({
+          cls: "voice-info",
+          attr: { id: "voice-info" },
+        });
+        infoEl.createEl("p", {
+          text: `Total voices available: ${voices.length}`,
+        });
+        infoEl.createEl("p", {
+          text: `Languages supported: ${languages.length}`,
+        });
+      }
+
+      // Language selection
+      const langContainer = settingsContainer.createDiv({
+        cls: "language-setting",
+        attr: { id: "language-setting" },
+      });
+      new Setting(langContainer)
+        .setName("Default Language")
+        .setDesc("Choose the default language for text-to-speech")
+        .addDropdown((dropdown) => {
+          languages.forEach((lang) => {
+            dropdown.addOption(lang, lang);
+          });
+          dropdown.setValue(this.plugin.settings.defaultLanguage);
+          dropdown.onChange(async (value) => {
+            this.plugin.settings.defaultLanguage = value;
+            await this.plugin.saveSettings();
+            // Refresh voice options when language changes
+            updateVoiceSettings();
+          });
+        });
+
+      const updateVoiceSettings = () => {
+        // Remove existing voice setting
+        const voiceSetting = settingsContainer.querySelector("#voice-setting");
+        if (voiceSetting) {
+          voiceSetting.remove();
+        }
+
+        // Voice selection based on selected language
+        // const voices = this.plugin.getAvailableVoices();
+        const selectedLang = this.plugin.settings.defaultLanguage;
+        const availableVoices = voices.filter(
+          (voice) =>
+            voice.lang === selectedLang ||
+            voice.lang.startsWith(selectedLang.split("-")[0])
+        );
+
+        if (availableVoices.length > 0) {
+          const voiceContainer = settingsContainer.createDiv({
+            cls: "voice-setting",
+            attr: { id: "voice-setting" },
+          });
+          new Setting(voiceContainer)
+            .setName("Preferred Voice")
+            .setDesc(`Choose a specific voice for ${selectedLang}`)
+            .addDropdown((dropdown) => {
+              dropdown.addOption("", "Auto (System Default)");
+              availableVoices.forEach((voice) => {
+                dropdown.addOption(voice.name, `${voice.name} (${voice.lang})`);
+              });
+              dropdown.setValue(this.plugin.settings.selectedVoice);
+              dropdown.onChange(async (value) => {
+                this.plugin.settings.selectedVoice = value;
+                await this.plugin.saveSettings();
+              });
+            });
+        }
+      };
+
+      updateVoiceSettings();
+
+      // Test button
+      new Setting(testContainer)
+        .setName("Test Voice")
+        .setDesc("Test the selected voice settings")
+        .addButton((button) => {
+          button.setButtonText("Test Speech");
+          button.onClick(() => {
+            const testText =
+              "Hello, this is a test of the text-to-speech functionality.";
+            this.plugin.speakText(
+              testText,
+              this.plugin.settings.defaultLanguage
+            );
+          });
+        });
+    };
+
+    // Initial load
+    if (window.speechSynthesis.getVoices().length === 0) {
+      // Voices not loaded yet, wait for them
+      window.speechSynthesis.onvoiceschanged = updateSettings;
+      containerEl.createEl("p", {
+        text: "Loading available voices...",
+        attr: { id: "loading-msg" },
+      });
+    } else {
+      updateSettings();
     }
   }
 }
