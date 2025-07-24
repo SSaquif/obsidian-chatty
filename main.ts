@@ -105,10 +105,9 @@ class VoiceAnnotationSettingTab extends PluginSettingTab {
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
-
     containerEl.createEl("h1", { text: "Voice Annotation Settings" });
 
-    // Wait for voices to load
+    // Creates/Updates the relevant settings UI and functionality
     const updateSettings = () => {
       containerEl.querySelector("#loading-msg")?.remove();
       containerEl.querySelector("#container")?.remove();
@@ -147,7 +146,7 @@ class VoiceAnnotationSettingTab extends PluginSettingTab {
         });
       }
 
-      // Language selection
+      // Language selection settings
       const langContainer = settingsContainer.createDiv({
         cls: "language-setting",
         attr: { id: "language-setting" },
@@ -168,6 +167,7 @@ class VoiceAnnotationSettingTab extends PluginSettingTab {
           });
         });
 
+      // Voice selection settings
       const updateVoiceSettings = () => {
         // Remove existing voice setting
         const voiceSetting = settingsContainer.querySelector("#voice-setting");
@@ -178,11 +178,9 @@ class VoiceAnnotationSettingTab extends PluginSettingTab {
         // Voice selection based on selected language
         // const voices = this.plugin.getAvailableVoices();
         const selectedLang = this.plugin.settings.defaultLanguage;
-        const availableVoices = voices.filter(
-          (voice) =>
-            voice.lang === selectedLang ||
-            voice.lang.startsWith(selectedLang.split("-")[0])
-        );
+        const availableVoices = voices.filter((voice) => {
+          return voice.lang === selectedLang; // || voice.lang.startsWith(selectedLang)
+        });
 
         if (availableVoices.length > 0) {
           const voiceContainer = settingsContainer.createDiv({
@@ -208,7 +206,7 @@ class VoiceAnnotationSettingTab extends PluginSettingTab {
 
       updateVoiceSettings();
 
-      // Test button
+      // Test button settings
       new Setting(testContainer)
         .setName("Test Voice")
         .setDesc("Test the selected voice settings")
