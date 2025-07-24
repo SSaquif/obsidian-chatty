@@ -9,27 +9,27 @@ import {
   Setting,
 } from "obsidian";
 
-interface VoiceAnnotationSettings {
+interface ChattySettings {
   defaultLanguage: SpeechSynthesisVoice["lang"];
   selectedVoice: SpeechSynthesisVoice["name"];
 }
 
-const DEFAULT_SETTINGS: VoiceAnnotationSettings = {
+const DEFAULT_SETTINGS: ChattySettings = {
   defaultLanguage: navigator.language || "",
   selectedVoice:
     window.speechSynthesis.getVoices().find((voice) => voice.default)?.name ||
     "",
 };
 
-export default class VoiceAnnotationPlugin extends Plugin {
-  settings: VoiceAnnotationSettings;
+export default class ChattyPlugin extends Plugin {
+  settings: ChattySettings;
 
   async onload() {
     await this.loadSettings();
     new Notice("Voice Annotation Plugin loaded");
 
     // Add settings tab
-    this.addSettingTab(new VoiceAnnotationSettingTab(this.app, this));
+    this.addSettingTab(new ChattySettingTab(this.app, this));
 
     // Add an item to editor menu
     this.registerEvent(
@@ -105,10 +105,10 @@ export default class VoiceAnnotationPlugin extends Plugin {
   }
 }
 
-class VoiceAnnotationSettingTab extends PluginSettingTab {
-  plugin: VoiceAnnotationPlugin;
+class ChattySettingTab extends PluginSettingTab {
+  plugin: ChattyPlugin;
 
-  constructor(app: App, plugin: VoiceAnnotationPlugin) {
+  constructor(app: App, plugin: ChattyPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }

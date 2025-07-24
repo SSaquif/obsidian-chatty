@@ -1,6 +1,8 @@
 {
-  "id": "obisidian-voice-annotation",
-  "name": "Obsidian Voice Annotation",
+  "id": "chatty",
+  "name": "Chatty",
   "version": "1.0.0",
-  "author": "Sadnan Saquif"
+  "description": "A simple plugin for Obsidian that allows you to listen to your notes using text-to-speech. Uses the browser's built-in speech synthesis capabilities and your default system voices.",
+  "author": "Sadnan Saquif",
+  "repository": ""
 }
