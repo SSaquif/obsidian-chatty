@@ -209,7 +209,6 @@ class ChattySettingTab extends PluginSettingTab {
             .setName("Preferred Voice")
             .setDesc(`Choose a specific voice for ${selectedLang}`)
             .addDropdown((dropdown) => {
-              dropdown.addOption("", "Auto (System Default)");
               availableVoices.forEach((voice) => {
                 dropdown.addOption(voice.name, `${voice.name} (${voice.lang})`);
               });
@@ -257,7 +256,7 @@ class ChattySettingTab extends PluginSettingTab {
             .setDisabled(true);
         })
         .addButton((button) => {
-          button.setIcon("plus").setTooltip("Set Hotkey");
+          button.setIcon("plus").setTooltip("Set/Update Hotkey");
           const keyDownHandler = (event: KeyboardEvent) => {
             // Ignore if ONLY a modifier key is pressed
             const isModifier =
@@ -289,7 +288,7 @@ class ChattySettingTab extends PluginSettingTab {
           });
         })
         .addButton((button) => {
-          button.setIcon("reset").setTooltip("Reset Hotkey");
+          button.setIcon("reset").setTooltip("Reset Hotkey to Default");
           button.onClick(async () => {
             this.plugin.settings.chattyDictateSelectionHotkey = "Ctrl+Shift+S"; // Reset to default
             await this.plugin.saveSettings();
