@@ -3,15 +3,16 @@ import {
   Plugin,
   Notice,
   Editor,
-  Menu,
   MarkdownView,
   PluginSettingTab,
   Setting,
+  TextComponent,
 } from "obsidian";
 
 interface ChattySettings {
   defaultLanguage: SpeechSynthesisVoice["lang"];
   selectedVoice: SpeechSynthesisVoice["name"];
+  chattyDictateSelectionHotkey?: string; // Optional hotkey for dictating selected text
 }
 
 const DEFAULT_SETTINGS: ChattySettings = {
@@ -121,7 +122,7 @@ class ChattySettingTab extends PluginSettingTab {
     containerEl.createEl("h1", { text: "Chatty Settings" });
 
     // Creates/Updates the relevant settings UI and functionality
-    const updateSettings = () => {
+    const updateSettings = async () => {
       containerEl.querySelector("#loading-msg")?.remove();
       containerEl.querySelector("#container")?.remove();
 
@@ -141,6 +142,10 @@ class ChattySettingTab extends PluginSettingTab {
       const testContainer = mainContainer.createDiv({
         cls: "test-container",
         attr: { id: "test-container" },
+      });
+      const keyBindingsContainer = mainContainer.createDiv({
+        cls: "key-bindings-container",
+        attr: { id: "key-bindings-container" },
       });
 
       // Voice & Language info
@@ -181,7 +186,7 @@ class ChattySettingTab extends PluginSettingTab {
         });
 
       // Voice selection settings
-      const updateVoiceSettings = () => {
+      const updateVoiceSettings = async () => {
         // Remove existing voice setting
         const voiceSetting = settingsContainer.querySelector("#voice-setting");
         if (voiceSetting) {
@@ -233,6 +238,74 @@ class ChattySettingTab extends PluginSettingTab {
               this.plugin.settings.defaultLanguage,
               this.plugin.settings.selectedVoice
             );
+          });
+        });
+
+      // Key bindings settings
+      let hotkeyText: TextComponent;
+      new Setting(keyBindingsContainer)
+        .setName("Hotkey | Dictate Selection")
+        .setDesc("Set a hotkey to dictate the selected text")
+        .addText((text) => {
+          hotkeyText = text;
+          text
+            .setValue(
+              this.plugin.settings.chattyDictateSelectionHotkey ||
+                "Ctrl+Shift+S"
+            )
+            .setPlaceholder("Press a key combination")
+            .setDisabled(true);
+        })
+        .addButton((button) => {
+          button.setIcon("plus").setTooltip("Set Hotkey");
+          const keyDownHandler = (event: KeyboardEvent) => {
+            // Ignore if ONLY a modifier key is pressed
+            const isModifier =
+              event.key === "Control" ||
+              event.key === "Shift" ||
+              event.key === "Alt" ||
+              event.key === "Meta";
+            if (isModifier) return;
+
+            let combo = [];
+            if (event.ctrlKey) combo.push("Ctrl");
+            if (event.shiftKey) combo.push("Shift");
+            if (event.altKey) combo.push("Alt");
+            if (event.metaKey) combo.push("Meta");
+            // Single letter keys will be converted to uppercase
+            combo.push(
+              event.key.length === 1 ? event.key.toUpperCase() : event.key
+            );
+            const hotkey = combo.join("+");
+            this.plugin.settings.chattyDictateSelectionHotkey = hotkey;
+            this.plugin.saveSettings();
+            hotkeyText.setValue(hotkey);
+            new Notice(`Hotkey set to: ${hotkey}`);
+            window.removeEventListener("keydown", keyDownHandler, true);
+          };
+          button.onClick(() => {
+            new Notice("Press Hotkey ...");
+            window.addEventListener("keydown", keyDownHandler, true);
+          });
+        })
+        .addButton((button) => {
+          button.setIcon("reset").setTooltip("Reset Hotkey");
+          button.onClick(async () => {
+            this.plugin.settings.chattyDictateSelectionHotkey = "Ctrl+Shift+S"; // Reset to default
+            await this.plugin.saveSettings();
+            hotkeyText.setValue(
+              this.plugin.settings.chattyDictateSelectionHotkey
+            );
+            new Notice("Hotkey reset to default.");
+          });
+        })
+        .addButton((button) => {
+          button.setIcon("trash").setTooltip("Clear Hotkey");
+          button.onClick(async () => {
+            this.plugin.settings.chattyDictateSelectionHotkey = "";
+            await this.plugin.saveSettings();
+            hotkeyText.setValue("");
+            new Notice("Hotkey cleared.");
           });
         });
     };
