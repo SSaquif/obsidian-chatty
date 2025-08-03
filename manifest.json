@@ -1,7 +1,7 @@
 {
   "id": "chatty",
   "name": "Chatty",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "minAppVersion": "1.8.10",
   "description": "Allows you to listen to your notes using text-to-speech. Uses the browser's built-in speech synthesis capabilities and your default system voices.",
   "author": "Sadnan Saquif",
