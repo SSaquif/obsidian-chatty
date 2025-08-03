@@ -6,6 +6,5 @@
   "description": "Allows you to listen to your notes using text-to-speech. Uses the browser's built-in speech synthesis capabilities and your default system voices.",
   "author": "Sadnan Saquif",
   "authorUrl": "https://github.com/SSaquif",
-  "repository": "https://github.com/SSaquif/obsidian-chatty",
   "isDesktopOnly": false
 }
