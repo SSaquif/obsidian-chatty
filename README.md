@@ -17,12 +17,14 @@ For Windows, you can do this by going to Settings > Time & Language > Language, 
 
 ## Features
 
-You can either select text in your notes, right-click, and select "Speak Selected Text".
+You can either select the text in your notes, right-click, and select "Speak Selected Text".
 
 ![Speak Selected Text](./images/chatty-speak-selection.png)
 
-Or you can select the text and then use hotkeys, the default hotkey is `Ctrl + Alt + S`.
+Or you can select the text and then use the hotkey combination, the default hotkey is `Ctrl + Alt + S`.
 
 But you can change this in the plugin settings, along with the voice and language settings.
+
+> Beware that certain hotkey combinations may not work as they might already be used by Obsidian or by other plugins.
 
 ![Chatty Settings](./images/chatty-settings.png)

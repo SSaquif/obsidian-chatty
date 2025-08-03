@@ -1,12 +1,13 @@
-/* add a border bottom */
 .info-container {
   border-bottom: 1px solid var(--background-modifier-border);
   margin-bottom: 0.75rem;
 }
+
 .settings-container {
   border-bottom: 1px solid var(--background-modifier-border);
   margin-bottom: 0.75rem;
 }
+
 .test-container {
   border-bottom: 1px solid var(--background-modifier-border);
   margin-bottom: 0.75rem;

@@ -2,7 +2,10 @@
   "id": "chatty",
   "name": "Chatty",
   "version": "1.0.0",
+  "minAppVersion": "1.8.10",
   "description": "Allows you to listen to your notes using text-to-speech. Uses the browser's built-in speech synthesis capabilities and your default system voices.",
   "author": "Sadnan Saquif",
-  "repository": "https://github.com/SSaquif/obsidian-chatty"
+  "authorUrl": "https://github.com/SSaquif",
+  "repository": "https://github.com/SSaquif/obsidian-chatty",
+  "isDesktopOnly": false
 }
