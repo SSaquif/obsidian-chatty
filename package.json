@@ -1,7 +1,7 @@
 {
   "name": "obsidian-chatty",
   "version": "1.0.0",
-  "description": "A simple plugin for Obsidian that allows you to listen to your notes using text-to-speech. Uses the browser's built-in speech synthesis capabilities and your default system voices.",
+  "description": "Allows you to listen to your notes using text-to-speech. Uses the browser's built-in speech synthesis capabilities and your default system voices.",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
