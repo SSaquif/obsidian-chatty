@@ -24,6 +24,7 @@ const DEFAULT_SETTINGS: ChattySettings = {
 
 export default class ChattyPlugin extends Plugin {
   settings: ChattySettings;
+  private dictateSelectionHotkeyHanlder: (event: KeyboardEvent) => void;
 
   async onload() {
     await this.loadSettings();
@@ -57,11 +58,50 @@ export default class ChattyPlugin extends Plugin {
         }
       )
     );
+
+    this.dictateSelectionHotkeyHanlder = (event: KeyboardEvent) => {
+      const hotkey = this.settings.chattyDictateSelectionHotkey;
+      if (!hotkey) return;
+      let keyCombo = [];
+      if (event.ctrlKey) keyCombo.push("Ctrl");
+      if (event.shiftKey) keyCombo.push("Shift");
+      if (event.altKey) keyCombo.push("Alt");
+      if (event.metaKey) keyCombo.push("Meta");
+      // Uppercase because setting is stored in uppercase
+      keyCombo.push(
+        event.key.length === 1 ? event.key.toUpperCase() : event.key
+      );
+      const pressedHotkey = keyCombo.join("+");
+
+      if (pressedHotkey === hotkey) {
+        event.preventDefault();
+        const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+        if (activeView) {
+          const editor = activeView.editor;
+          const selectedText = editor.getSelection();
+          if (selectedText) {
+            this.speakText(
+              selectedText,
+              this.settings.defaultLanguage,
+              this.settings.selectedVoice
+            );
+          } else {
+            new Notice("No text selected to dictate.");
+          }
+        }
+      }
+    };
+
+    window.addEventListener("keydown", this.dictateSelectionHotkeyHanlder);
   }
 
   onunload() {
     // Cancel any ongoing speech synthesis
     window.speechSynthesis.cancel();
+    // Remove the hotkey event listener
+    if (this.dictateSelectionHotkeyHanlder) {
+      window.removeEventListener("keydown", this.dictateSelectionHotkeyHanlder);
+    }
   }
 
   async loadSettings() {
