@@ -82,7 +82,7 @@ export default class ChattyPlugin extends Plugin {
           menu.addItem((item) => {
             item
               .setTitle("Speak Selected Text")
-              .setIcon("speaker")
+              .setIcon("volume-2")
               .onClick(() => {
                 this.speakText(
                   selectedText,
