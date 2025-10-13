@@ -7,16 +7,17 @@ import {
   PluginSettingTab,
   Setting,
   TextComponent,
+  getLanguage,
 } from "obsidian";
 
 interface ChattySettings {
-  defaultLanguage: SpeechSynthesisVoice["lang"];
+  defaultLanguage: ReturnType<typeof getLanguage>;
   selectedVoice: SpeechSynthesisVoice["name"];
   chattyDictateSelectionHotkey?: string; // Optional hotkey for dictating selected text
 }
 
 const DEFAULT_SETTINGS: ChattySettings = {
-  defaultLanguage: navigator.language || "",
+  defaultLanguage: getLanguage() || "",
   selectedVoice:
     window.speechSynthesis.getVoices().find((voice) => voice.default)?.name ||
     "",
