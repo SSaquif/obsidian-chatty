@@ -26,11 +26,11 @@ const DEFAULT_SETTINGS: ChattySettings = {
 
 export default class ChattyPlugin extends Plugin {
   settings: ChattySettings;
-  private dictateSelectionHotkeyHanlder: (event: KeyboardEvent) => void;
+  private dictateSelectionHotkeyHandler: (event: KeyboardEvent) => void;
 
   constructor(app: App, manifest: PluginManifest) {
     super(app, manifest);
-    this.dictateSelectionHotkeyHanlder = (event: KeyboardEvent) => {
+    this.dictateSelectionHotkeyHandler = (event: KeyboardEvent) => {
       const hotkey = this.settings.chattyDictateSelectionHotkey;
       if (!hotkey) return;
       let keyCombo = [];
@@ -98,15 +98,15 @@ export default class ChattyPlugin extends Plugin {
     );
 
     // Register the hotkey handler for dictating selected text
-    window.addEventListener("keydown", this.dictateSelectionHotkeyHanlder);
+    window.addEventListener("keydown", this.dictateSelectionHotkeyHandler);
   }
 
   onunload() {
     // Cancel any ongoing speech synthesis
     window.speechSynthesis.cancel();
     // Remove the hotkey event listener
-    if (this.dictateSelectionHotkeyHanlder) {
-      window.removeEventListener("keydown", this.dictateSelectionHotkeyHanlder);
+    if (this.dictateSelectionHotkeyHandler) {
+      window.removeEventListener("keydown", this.dictateSelectionHotkeyHandler);
     }
   }
 
