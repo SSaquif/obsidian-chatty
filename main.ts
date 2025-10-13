@@ -12,13 +12,13 @@ import {
 } from "obsidian";
 
 interface ChattySettings {
-  defaultLanguage: ReturnType<typeof getLanguage>;
-  selectedVoice: SpeechSynthesisVoice["name"];
+  defaultLanguage: string;
+  selectedVoice: string;
   chattyDictateSelectionHotkey?: string; // Optional hotkey for dictating selected text
 }
 
 const DEFAULT_SETTINGS: ChattySettings = {
-  defaultLanguage: getLanguage() || "",
+  defaultLanguage: getLanguage(),
   selectedVoice:
     window.speechSynthesis.getVoices().find((voice) => voice.default)?.name ||
     "",
