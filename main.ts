@@ -1,5 +1,6 @@
 import {
   App,
+  PluginManifest,
   Plugin,
   Notice,
   Editor,
@@ -7,16 +8,17 @@ import {
   PluginSettingTab,
   Setting,
   TextComponent,
+  getLanguage,
 } from "obsidian";
 
 interface ChattySettings {
-  defaultLanguage: SpeechSynthesisVoice["lang"];
-  selectedVoice: SpeechSynthesisVoice["name"];
+  defaultLanguage: string;
+  selectedVoice: string;
   chattyDictateSelectionHotkey?: string; // Optional hotkey for dictating selected text
 }
 
 const DEFAULT_SETTINGS: ChattySettings = {
-  defaultLanguage: navigator.language || "",
+  defaultLanguage: getLanguage(),
   selectedVoice:
     window.speechSynthesis.getVoices().find((voice) => voice.default)?.name ||
     "",
@@ -24,11 +26,11 @@ const DEFAULT_SETTINGS: ChattySettings = {
 
 export default class ChattyPlugin extends Plugin {
   settings: ChattySettings;
-  private dictateSelectionHotkeyHanlder: (event: KeyboardEvent) => void;
+  private dictateSelectionHotkeyHandler: (event: KeyboardEvent) => void;
 
-  constructor(app: App, manifest: any) {
+  constructor(app: App, manifest: PluginManifest) {
     super(app, manifest);
-    this.dictateSelectionHotkeyHanlder = (event: KeyboardEvent) => {
+    this.dictateSelectionHotkeyHandler = (event: KeyboardEvent) => {
       const hotkey = this.settings.chattyDictateSelectionHotkey;
       if (!hotkey) return;
       let keyCombo = [];
@@ -65,7 +67,7 @@ export default class ChattyPlugin extends Plugin {
   async onload() {
     await this.loadSettings();
     new Notice(
-      `Chatty Plugin Loaded\nLanguage: ${this.settings.defaultLanguage}\nVoice: ${this.settings.selectedVoice}`
+      `Chatty plugin loaded.\nLanguage: ${this.settings.defaultLanguage}.\nVoice: ${this.settings.selectedVoice}.`
     );
 
     // Add settings tab
@@ -96,15 +98,15 @@ export default class ChattyPlugin extends Plugin {
     );
 
     // Register the hotkey handler for dictating selected text
-    window.addEventListener("keydown", this.dictateSelectionHotkeyHanlder);
+    window.addEventListener("keydown", this.dictateSelectionHotkeyHandler);
   }
 
   onunload() {
     // Cancel any ongoing speech synthesis
     window.speechSynthesis.cancel();
     // Remove the hotkey event listener
-    if (this.dictateSelectionHotkeyHanlder) {
-      window.removeEventListener("keydown", this.dictateSelectionHotkeyHanlder);
+    if (this.dictateSelectionHotkeyHandler) {
+      window.removeEventListener("keydown", this.dictateSelectionHotkeyHandler);
     }
   }
 
@@ -163,33 +165,33 @@ class ChattySettingTab extends PluginSettingTab {
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h1", { text: "Chatty Settings" });
+    new Setting(containerEl).setName("Chatty plugin settings").setHeading();
 
     // Creates/Updates the relevant settings UI and functionality
     const updateSettings = async () => {
-      containerEl.querySelector("#loading-msg")?.remove();
-      containerEl.querySelector("#container")?.remove();
+      containerEl.querySelector("#loading-msg-chatty-plugin")?.remove();
+      containerEl.querySelector("#container-chatty-plugin")?.remove();
 
       // Create the settings sections
       const mainContainer = containerEl.createDiv({
-        cls: "container",
-        attr: { id: "container" },
+        cls: "container-chatty-plugin",
+        attr: { id: "container-chatty-plugin" },
       });
       const infoContainer = mainContainer.createDiv({
-        cls: "info-container",
-        attr: { id: "info-container" },
+        cls: "info-container-chatty-plugin",
+        attr: { id: "info-container-chatty-plugin" },
       });
       const settingsContainer = mainContainer.createDiv({
-        cls: "settings-container",
-        attr: { id: "settings-container" },
+        cls: "settings-container-chatty-plugin",
+        attr: { id: "settings-container-chatty-plugin" },
       });
       const testContainer = mainContainer.createDiv({
-        cls: "test-container",
-        attr: { id: "test-container" },
+        cls: "test-container-chatty-plugin",
+        attr: { id: "test-container-chatty-plugin" },
       });
       const keyBindingsContainer = mainContainer.createDiv({
-        cls: "key-bindings-container",
-        attr: { id: "key-bindings-container" },
+        cls: "key-bindings-container-chatty-plugin",
+        attr: { id: "key-bindings-container-chatty-plugin" },
       });
 
       // Voice & Language info
@@ -197,8 +199,8 @@ class ChattySettingTab extends PluginSettingTab {
       const languages = this.plugin.getAvailableLanguages();
       if (voices.length > 0) {
         const infoEl = infoContainer.createDiv({
-          cls: "voice-info",
-          attr: { id: "voice-info" },
+          cls: "voice-info-chatty-plugin",
+          attr: { id: "voice-info-chatty-plugin" },
         });
         infoEl.createEl("p", {
           text: `Total voices available: ${voices.length}`,
@@ -210,11 +212,11 @@ class ChattySettingTab extends PluginSettingTab {
 
       // Language selection settings
       const langContainer = settingsContainer.createDiv({
-        cls: "language-setting",
-        attr: { id: "language-setting" },
+        cls: "language-setting-chatty-plugin",
+        attr: { id: "language-setting-chatty-plugin" },
       });
       new Setting(langContainer)
-        .setName("Default Language")
+        .setName("Default language")
         .setDesc("Choose the default language for text-to-speech")
         .addDropdown((dropdown) => {
           languages.forEach((lang) => {
@@ -232,7 +234,9 @@ class ChattySettingTab extends PluginSettingTab {
       // Voice selection settings
       const updateVoiceSettings = async () => {
         // Remove existing voice setting
-        const voiceSetting = settingsContainer.querySelector("#voice-setting");
+        const voiceSetting = settingsContainer.querySelector(
+          "#voice-setting-chatty-plugin"
+        );
         if (voiceSetting) {
           voiceSetting.remove();
         }
@@ -246,11 +250,11 @@ class ChattySettingTab extends PluginSettingTab {
 
         if (availableVoices.length > 0) {
           const voiceContainer = settingsContainer.createDiv({
-            cls: "voice-setting",
-            attr: { id: "voice-setting" },
+            cls: "voice-setting-chatty-plugin",
+            attr: { id: "voice-setting-chatty-plugin" },
           });
           new Setting(voiceContainer)
-            .setName("Preferred Voice")
+            .setName("Preferred voice")
             .setDesc(`Choose a specific voice for ${selectedLang}`)
             .addDropdown((dropdown) => {
               availableVoices.forEach((voice) => {
@@ -269,10 +273,10 @@ class ChattySettingTab extends PluginSettingTab {
 
       // Test button settings
       new Setting(testContainer)
-        .setName("Test Voice")
+        .setName("Test voice")
         .setDesc("Test the selected voice settings")
         .addButton((button) => {
-          button.setButtonText("Test Speech");
+          button.setButtonText("Test speech");
           button.onClick(() => {
             const testText =
               "Hello, this is a test of the text-to-speech functionality.";
@@ -287,7 +291,7 @@ class ChattySettingTab extends PluginSettingTab {
       // Key bindings settings
       let hotkeyText: TextComponent;
       new Setting(keyBindingsContainer)
-        .setName("Hotkey | Dictate Selection")
+        .setName("Dictate selection")
         .setDesc("Set a hotkey to dictate the selected text")
         .addText((text) => {
           hotkeyText = text;
@@ -300,7 +304,7 @@ class ChattySettingTab extends PluginSettingTab {
             .setDisabled(true);
         })
         .addButton((button) => {
-          button.setIcon("plus").setTooltip("Set/Update Hotkey");
+          button.setIcon("plus").setTooltip("Update hotkey");
           const keyDownHandler = (event: KeyboardEvent) => {
             // Ignore if ONLY a modifier key is pressed
             const isModifier =
@@ -332,7 +336,7 @@ class ChattySettingTab extends PluginSettingTab {
           });
         })
         .addButton((button) => {
-          button.setIcon("reset").setTooltip("Reset Hotkey to Default");
+          button.setIcon("reset").setTooltip("Reset hotkey to default");
           button.onClick(async () => {
             this.plugin.settings.chattyDictateSelectionHotkey = "Ctrl+Shift+S"; // Reset to default
             await this.plugin.saveSettings();
@@ -343,7 +347,7 @@ class ChattySettingTab extends PluginSettingTab {
           });
         })
         .addButton((button) => {
-          button.setIcon("trash").setTooltip("Clear Hotkey");
+          button.setIcon("trash").setTooltip("Clear hotkey");
           button.onClick(async () => {
             this.plugin.settings.chattyDictateSelectionHotkey = "";
             await this.plugin.saveSettings();
@@ -359,7 +363,7 @@ class ChattySettingTab extends PluginSettingTab {
       window.speechSynthesis.onvoiceschanged = updateSettings;
       containerEl.createEl("p", {
         text: "Loading available voices...",
-        attr: { id: "loading-msg" },
+        attr: { id: "loading-msg-chatty-plugin" },
       });
     } else {
       updateSettings();
