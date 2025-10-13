@@ -1,5 +1,6 @@
 import {
   App,
+  PluginManifest,
   Plugin,
   Notice,
   Editor,
@@ -27,7 +28,7 @@ export default class ChattyPlugin extends Plugin {
   settings: ChattySettings;
   private dictateSelectionHotkeyHanlder: (event: KeyboardEvent) => void;
 
-  constructor(app: App, manifest: any) {
+  constructor(app: App, manifest: PluginManifest) {
     super(app, manifest);
     this.dictateSelectionHotkeyHanlder = (event: KeyboardEvent) => {
       const hotkey = this.settings.chattyDictateSelectionHotkey;
