@@ -169,29 +169,29 @@ class ChattySettingTab extends PluginSettingTab {
 
     // Creates/Updates the relevant settings UI and functionality
     const updateSettings = async () => {
-      containerEl.querySelector("#loading-msg")?.remove();
-      containerEl.querySelector("#container")?.remove();
+      containerEl.querySelector("#loading-msg-chatty-plugin")?.remove();
+      containerEl.querySelector("#container-chatty-plugin")?.remove();
 
       // Create the settings sections
       const mainContainer = containerEl.createDiv({
-        cls: "container",
-        attr: { id: "container" },
+        cls: "container-chatty-plugin",
+        attr: { id: "container-chatty-plugin" },
       });
       const infoContainer = mainContainer.createDiv({
-        cls: "info-container",
-        attr: { id: "info-container" },
+        cls: "info-container-chatty-plugin",
+        attr: { id: "info-container-chatty-plugin" },
       });
       const settingsContainer = mainContainer.createDiv({
-        cls: "settings-container",
-        attr: { id: "settings-container" },
+        cls: "settings-container-chatty-plugin",
+        attr: { id: "settings-container-chatty-plugin" },
       });
       const testContainer = mainContainer.createDiv({
-        cls: "test-container",
-        attr: { id: "test-container" },
+        cls: "test-container-chatty-plugin",
+        attr: { id: "test-container-chatty-plugin" },
       });
       const keyBindingsContainer = mainContainer.createDiv({
-        cls: "key-bindings-container",
-        attr: { id: "key-bindings-container" },
+        cls: "key-bindings-container-chatty-plugin",
+        attr: { id: "key-bindings-container-chatty-plugin" },
       });
 
       // Voice & Language info
@@ -199,8 +199,8 @@ class ChattySettingTab extends PluginSettingTab {
       const languages = this.plugin.getAvailableLanguages();
       if (voices.length > 0) {
         const infoEl = infoContainer.createDiv({
-          cls: "voice-info",
-          attr: { id: "voice-info" },
+          cls: "voice-info-chatty-plugin",
+          attr: { id: "voice-info-chatty-plugin" },
         });
         infoEl.createEl("p", {
           text: `Total voices available: ${voices.length}`,
@@ -212,8 +212,8 @@ class ChattySettingTab extends PluginSettingTab {
 
       // Language selection settings
       const langContainer = settingsContainer.createDiv({
-        cls: "language-setting",
-        attr: { id: "language-setting" },
+        cls: "language-setting-chatty-plugin",
+        attr: { id: "language-setting-chatty-plugin" },
       });
       new Setting(langContainer)
         .setName("Default language")
@@ -234,7 +234,9 @@ class ChattySettingTab extends PluginSettingTab {
       // Voice selection settings
       const updateVoiceSettings = async () => {
         // Remove existing voice setting
-        const voiceSetting = settingsContainer.querySelector("#voice-setting");
+        const voiceSetting = settingsContainer.querySelector(
+          "#voice-setting-chatty-plugin"
+        );
         if (voiceSetting) {
           voiceSetting.remove();
         }
@@ -248,8 +250,8 @@ class ChattySettingTab extends PluginSettingTab {
 
         if (availableVoices.length > 0) {
           const voiceContainer = settingsContainer.createDiv({
-            cls: "voice-setting",
-            attr: { id: "voice-setting" },
+            cls: "voice-setting-chatty-plugin",
+            attr: { id: "voice-setting-chatty-plugin" },
           });
           new Setting(voiceContainer)
             .setName("Preferred voice")
@@ -361,7 +363,7 @@ class ChattySettingTab extends PluginSettingTab {
       window.speechSynthesis.onvoiceschanged = updateSettings;
       containerEl.createEl("p", {
         text: "Loading available voices...",
-        attr: { id: "loading-msg" },
+        attr: { id: "loading-msg-chatty-plugin" },
       });
     } else {
       updateSettings();

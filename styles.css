@@ -1,14 +1,14 @@
-.info-container {
+.info-container-chatty-plugin {
   border-bottom: 1px solid var(--background-modifier-border);
   margin-bottom: 0.75rem;
 }
 
-.settings-container {
+.settings-container-chatty-plugin {
   border-bottom: 1px solid var(--background-modifier-border);
   margin-bottom: 0.75rem;
 }
 
-.test-container {
+.test-container-chatty-plugin {
   border-bottom: 1px solid var(--background-modifier-border);
   margin-bottom: 0.75rem;
 }
