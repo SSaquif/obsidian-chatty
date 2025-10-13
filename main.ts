@@ -67,7 +67,7 @@ export default class ChattyPlugin extends Plugin {
   async onload() {
     await this.loadSettings();
     new Notice(
-      `Chatty Plugin Loaded\nLanguage: ${this.settings.defaultLanguage}\nVoice: ${this.settings.selectedVoice}`
+      `Chatty plugin loaded.\nLanguage: ${this.settings.defaultLanguage}.\nVoice: ${this.settings.selectedVoice}.`
     );
 
     // Add settings tab
@@ -216,7 +216,7 @@ class ChattySettingTab extends PluginSettingTab {
         attr: { id: "language-setting" },
       });
       new Setting(langContainer)
-        .setName("Default Language")
+        .setName("Default language")
         .setDesc("Choose the default language for text-to-speech")
         .addDropdown((dropdown) => {
           languages.forEach((lang) => {
@@ -252,7 +252,7 @@ class ChattySettingTab extends PluginSettingTab {
             attr: { id: "voice-setting" },
           });
           new Setting(voiceContainer)
-            .setName("Preferred Voice")
+            .setName("Preferred voice")
             .setDesc(`Choose a specific voice for ${selectedLang}`)
             .addDropdown((dropdown) => {
               availableVoices.forEach((voice) => {
@@ -271,10 +271,10 @@ class ChattySettingTab extends PluginSettingTab {
 
       // Test button settings
       new Setting(testContainer)
-        .setName("Test Voice")
+        .setName("Test voice")
         .setDesc("Test the selected voice settings")
         .addButton((button) => {
-          button.setButtonText("Test Speech");
+          button.setButtonText("Test speech");
           button.onClick(() => {
             const testText =
               "Hello, this is a test of the text-to-speech functionality.";
@@ -289,7 +289,7 @@ class ChattySettingTab extends PluginSettingTab {
       // Key bindings settings
       let hotkeyText: TextComponent;
       new Setting(keyBindingsContainer)
-        .setName("Hotkey | Dictate Selection")
+        .setName("Dictate selection")
         .setDesc("Set a hotkey to dictate the selected text")
         .addText((text) => {
           hotkeyText = text;
@@ -302,7 +302,7 @@ class ChattySettingTab extends PluginSettingTab {
             .setDisabled(true);
         })
         .addButton((button) => {
-          button.setIcon("plus").setTooltip("Set/Update Hotkey");
+          button.setIcon("plus").setTooltip("Update hotkey");
           const keyDownHandler = (event: KeyboardEvent) => {
             // Ignore if ONLY a modifier key is pressed
             const isModifier =
@@ -334,7 +334,7 @@ class ChattySettingTab extends PluginSettingTab {
           });
         })
         .addButton((button) => {
-          button.setIcon("reset").setTooltip("Reset Hotkey to Default");
+          button.setIcon("reset").setTooltip("Reset hotkey to default");
           button.onClick(async () => {
             this.plugin.settings.chattyDictateSelectionHotkey = "Ctrl+Shift+S"; // Reset to default
             await this.plugin.saveSettings();
@@ -345,7 +345,7 @@ class ChattySettingTab extends PluginSettingTab {
           });
         })
         .addButton((button) => {
-          button.setIcon("trash").setTooltip("Clear Hotkey");
+          button.setIcon("trash").setTooltip("Clear hotkey");
           button.onClick(async () => {
             this.plugin.settings.chattyDictateSelectionHotkey = "";
             await this.plugin.saveSettings();
