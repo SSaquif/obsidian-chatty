@@ -163,7 +163,7 @@ class ChattySettingTab extends PluginSettingTab {
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h1", { text: "Chatty Settings" });
+    new Setting(containerEl).setName("Chatty plugin settings").setHeading();
 
     // Creates/Updates the relevant settings UI and functionality
     const updateSettings = async () => {
